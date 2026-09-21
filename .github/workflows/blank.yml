@@ -19,18 +19,17 @@ jobs:
         run: |
           curl -L -o lifedustry_automatic_setup.bat https://raw.githubusercontent.com/lifedustry/devdustry/main/main.bat
 
-      - name: Delete old release/tag if exists
-        uses: dev-drprasad/delete-tag-and-release@v1
-        with:
-          tag_name: latest
-          delete_release: true
+      - name: Delete old release and tag if they exist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete latest --yes || true
+          git push origin --delete latest || true
 
       - name: Create Release and Upload Asset
-        uses: softprops/action-gh-release@v2
-        with:
-          files: lifedustry_automatic_setup.bat
-          tag_name: latest
-          name: "Lifedustry Setup (Dernière version)"
-          body: "Mise à jour automatique du script d'installation à chaque commit sur main."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create latest lifedustry_automatic_setup.bat \
+            --title "Lifedustry Setup (Dernière version)" \
+            --notes "Mise à jour automatique du script d'installation à chaque commit sur main."
