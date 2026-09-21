@@ -1,12 +1,16 @@
-name: Package Script
+name: Release Script
 
 on:
   push:
+    tags:
+      - 'v*' # Se déclenche quand tu mets un tag (ex: git tag v1.0.0 puis git push origin v1.0.0)
   workflow_dispatch:
 
 jobs:
-  package:
+  release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Indispensable pour que l'action puisse créer une release
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -15,8 +19,8 @@ jobs:
         run: |
           curl -L -o lifedustry_automatic_setup.bat https://raw.githubusercontent.com/lifedustry/devdustry/main/main.bat
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Create Release and Upload Asset
+        uses: softprops/action-gh-release@v2
         with:
-          name: packaged-setup-script
-          path: lifedustry_automatic_setup.bat
+          files: lifedustry_automatic_setup.bat
+          tag_name: ${{ github.ref_name }} # Utilise le nom du tag ou crée un flux si déclenché manuellement
