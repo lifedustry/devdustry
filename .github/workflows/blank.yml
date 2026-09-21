@@ -1,0 +1,22 @@
+name: Package Script
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download setup script
+        run: |
+          curl -L -o lifedustry_automatic_setup.bat https://raw.githubusercontent.com/lifedustry/devdustry/main/main.bat
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: packaged-setup-script
+          path: lifedustry_automatic_setup.bat
