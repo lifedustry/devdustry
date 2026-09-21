@@ -32,7 +32,7 @@ del git.zip
 
 
 echo Download scripts and tools
-curl -L -o shell.bat "https://raw.githubusercontent.com/chocolife13/Lifedustry/refs/heads/main/docs/shell.bat"
-curl -L -o config.ps1 "https://raw.githubusercontent.com/chocolife13/Lifedustry/refs/heads/main/docs/config.ps1"
+curl -L -o shell.bat "https://raw.githubusercontent.com/lifedustry/devdustry/refs/heads/main/shell.bat"
+curl -L -o config.ps1 "https://raw.githubusercontent.com/lifedustry/devdustry/refs/heads/main/config.ps1"
 pause
 
