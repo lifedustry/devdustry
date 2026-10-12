@@ -30,7 +30,7 @@ jobs:
       run: pip install pyinstaller
 
     - name: Compilation du script en exécutable
-      run: pyinstaller --onefile --noconsole install.py
+      run: pyinstaller --onefile --noconsole main.py
 
     - name: Renommer l'exécutable
       shell: bash
