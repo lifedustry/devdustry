@@ -5,6 +5,9 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build for ${{ matrix.os }}
@@ -32,7 +35,7 @@ jobs:
     - name: Installation de PyInstaller
       run: pip install pyinstaller
 
-    - name: Compilation du script en exécutable
+    - name: Compilation du script
       run: pyinstaller ${{ matrix.pyinstaller_args }} main.py
 
     - name: Renommer l'exécutable
@@ -44,8 +47,30 @@ jobs:
           mv dist/main dist/${{ matrix.output_name }}
         fi
 
-    - name: Sauvegarder l'exécutable comme artefact
+    - name: Sauvegarder l'artefact
       uses: actions/upload-artifact@v4
       with:
         name: installer-${{ matrix.os }}
         path: dist/${{ matrix.output_name }}
+
+  release:
+    name: Create Nightly/Latest Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Télécharger les artefacts
+        uses: actions/download-artifact@v4
+        with:
+          path: bin/
+
+      - name: Publier/Mettre à jour la Release "latest"
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "Latest Auto-Build"
+          prerelease: true
+          files: |
+            bin/installer-windows-latest/install.exe
+            bin/installer-ubuntu-latest/install-linux
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
