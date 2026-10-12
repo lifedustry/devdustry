@@ -10,12 +10,15 @@ jobs:
     name: Build for ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: windows-latest
             output_name: install.exe
+            pyinstaller_args: "--onefile"
           - os: ubuntu-latest
             output_name: install-linux
+            pyinstaller_args: "--onefile"
 
     steps:
     - name: Récupération du code
@@ -30,15 +33,15 @@ jobs:
       run: pip install pyinstaller
 
     - name: Compilation du script en exécutable
-      run: pyinstaller --onefile --noconsole main.py
+      run: pyinstaller ${{ matrix.pyinstaller_args }} main.py
 
     - name: Renommer l'exécutable
       shell: bash
       run: |
         if [ "${{ matrix.os }}" == "windows-latest" ]; then
-          mv dist/install.exe dist/${{ matrix.output_name }}
+          mv dist/main.exe dist/${{ matrix.output_name }}
         else
-          mv dist/install dist/${{ matrix.output_name }}
+          mv dist/main dist/${{ matrix.output_name }}
         fi
 
     - name: Sauvegarder l'exécutable comme artefact
