@@ -1,35 +1,48 @@
-name: Auto Release Latest
+name: Build Installer
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
+  build:
+    name: Build for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            output_name: install.exe
+          - os: ubuntu-latest
+            output_name: install-linux
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Récupération du code
+      uses: actions/checkout@v4
 
-      - name: Download setup script
-        run: |
-          curl -L -o lifedustry_automatic_setup.bat https://raw.githubusercontent.com/lifedustry/devdustry/main/main.bat
+    - name: Installation de Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
 
-      - name: Delete old release and tag if they exist
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release delete latest --yes || true
-          git push origin --delete latest || true
+    - name: Installation de PyInstaller
+      run: pip install pyinstaller
 
-      - name: Create Release and Upload Asset
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create latest lifedustry_automatic_setup.bat \
-            --title "Devdustry" \
-            --notes "The dev tool for lifedustry!"
+    - name: Compilation du script en exécutable
+      run: pyinstaller --onefile --noconsole install.py
+
+    - name: Renommer l'exécutable
+      shell: bash
+      run: |
+        if [ "${{ matrix.os }}" == "windows-latest" ]; then
+          mv dist/install.exe dist/${{ matrix.output_name }}
+        else
+          mv dist/install dist/${{ matrix.output_name }}
+        fi
+
+    - name: Sauvegarder l'exécutable comme artefact
+      uses: actions/upload-artifact@v4
+      with:
+        name: installer-${{ matrix.os }}
+        path: dist/${{ matrix.output_name }}
