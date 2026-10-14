@@ -17,9 +17,9 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            asset_name: main-windows.exe
+            asset_name: devdustry.exe
           - os: ubuntu-latest
-            asset_name: main-linux.bin
+            asset_name: devdustry.bin
 
     steps:
       - name: Checkout repository
@@ -34,11 +34,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pyinstaller
-          # pip install -r requirements.txt (si besoin)
+          pip install -r requirements.txt
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller --onefile --noconsole main.py
+          pyinstaller --onefile main.py
 
       - name: Prepare binary
         shell: bash
@@ -78,5 +78,5 @@ jobs:
           name: "Release ${{ steps.meta.outputs.tag }}"
           body: "Mise à jour automatique des binaires depuis la branche main."
           files: |
-            all-binaries/binary-windows-latest/main-windows.exe
-            all-binaries/binary-ubuntu-latest/main-linux.bin
+            all-binaries/binary-windows-latest/devdustry.exe
+            all-binaries/binary-ubuntu-latest/devdustry.bin
